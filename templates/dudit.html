@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DUDIT Questionnaire</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>DUDIT Questionnaire</h1>
+    <form action="/dudit" method="post">
+        <table>
+            <tr>
+                <th>Questions</th>
+                {% for option in options %}
+                    <th>{{ option }}</th>
+                {% endfor %}
+            </tr>
+            {% for idx, question in enumerate(questions) %}
+                <tr>
+                    <td>{{ question }}</td>
+                    {% for option in options %}
+                        <td><input type="radio" name="q{{ idx }}" value="{{ option }}" required></td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

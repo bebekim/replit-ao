@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM-based Triage System</title>
+</head>
+<body>
+    <h1>Welcome to the Triage System</h1>
+    <form action="/submit" method="post">
+        <p>What brings you to the site today?</p>
+        <input type="radio" id="alcohol" name="issue" value="alcohol">
+        <label for="alcohol">I am developing a dependency in alcohol</label><br>
+        <input type="radio" id="drugs" name="issue" value="drugs">
+        <label for="drugs">I am developing or have developed a dependency in drugs</label><br>
+        <input type="radio" id="eating" name="issue" value="eating">
+        <label for="eating">I am developing a dependency in eating, becoming an emotional eater</label><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
