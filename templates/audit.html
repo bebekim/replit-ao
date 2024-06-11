@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audit Questionnaire</title>
+    <title>AUDIT Questionnaire</title>
     <style>
         table, th, td {
             border: 1px solid black;
@@ -13,21 +13,37 @@
     </style>
 </head>
 <body>
-    <h1>Audit Questionnaire</h1>
+    <h1>AUDIT Questionnaire</h1>
     <form action="/audit" method="post">
         <table>
             <tr>
                 <th>Questions</th>
-                {% for option in options %}
-                    <th>{{ option }}</th>
-                {% endfor %}
+                <th>0</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
             </tr>
             {% for idx, question in enumerate(questions) %}
                 <tr>
                     <td>{{ question }}</td>
-                    {% for option in options %}
-                        <td><input type="radio" name="q{{ idx }}" value="{{ option }}" required></td>
-                    {% endfor %}
+                    {% if idx == 1 %}
+                        <td><input type="radio" name="q{{ idx }}" value="1 or 2" required>1 or 2</td>
+                        <td><input type="radio" name="q{{ idx }}" value="3 or 4" required>3 or 4</td>
+                        <td><input type="radio" name="q{{ idx }}" value="5 or 6" required>5 or 6</td>
+                        <td><input type="radio" name="q{{ idx }}" value="7 to 9" required>7 to 9</td>
+                        <td><input type="radio" name="q{{ idx }}" value="10 or more" required>10 or more</td>
+                    {% elif idx == 8 or idx == 9 %}
+                        <td><input type="radio" name="q{{ idx }}" value="No" required>No</td>
+                        <td><input type="radio" name="q{{ idx }}" value="Yes, but not in the last year" required>Yes, but not in the last year</td>
+                        <td><input type="radio" name="q{{ idx }}" value="Yes, during the last year" required>Yes, during the last year</td>
+                    {% else %}
+                        <td><input type="radio" name="q{{ idx }}" value="Never" required>Never</td>
+                        <td><input type="radio" name="q{{ idx }}" value="Monthly or less" required>Monthly or less</td>
+                        <td><input type="radio" name="q{{ idx }}" value="2-4 times a month" required>2-4 times a month</td>
+                        <td><input type="radio" name="q{{ idx }}" value="2-3 times a week" required>2-3 times a week</td>
+                        <td><input type="radio" name="q{{ idx }}" value="4 or more times a week" required>4 or more times a week</td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </table>

@@ -22,6 +22,34 @@ dudit_options = [
     "Never", "Less than monthly", "Monthly", "Weekly", "Daily or almost daily"
 ]
 
+# AUDIT Questions
+audit_questions = [
+    "How often do you have a drink containing alcohol?",
+    "How many drinks containing alcohol do you have on a typical day when you are drinking?",
+    "How often do you have six or more drinks on one occasion?",
+    "How often during the last year have you found that you were not able to stop drinking once you had started?",
+    "How often during the last year have you failed to do what was normally expected from you because of drinking?",
+    "How often during the last year have you needed a first drink in the morning to get yourself going after a heavy drinking session?",
+    "How often during the last year have you had a feeling of guilt or remorse after drinking?",
+    "How often during the last year have you been unable to remember what happened the night before because you had been drinking?",
+    "Have you or someone else been injured as a result of your drinking?",
+    "Has a relative or friend or a doctor or another health worker been concerned about your drinking or suggested you cut down?"
+]
+
+# audit options
+audit_options = [
+    ["Never", "Monthly or less", "2-4 times a month", "2-3 times a week", "4 or more times a week"], 
+    ["1 or 2", "3 or 4", "5 or 6", "7 to 9", "10 or more"], 
+    ["Never", "Less than monthly", "Monthly", "Weekly", "Daily or almost daily"], 
+    ["Never", "Less than monthly", "Monthly", "Weekly", "Daily or almost daily"], 
+    ["Never", "Less than monthly", "Monthly", "Weekly", "Daily or almost daily"], 
+    ["Never", "Less than monthly", "Monthly", "Weekly", "Daily or almost daily"], 
+    ["Never", "Less than monthly", "Monthly", "Weekly", "Daily or almost daily"], 
+    ["Never", "Less than monthly", "Monthly", "Weekly", "Daily or almost daily"], 
+    ["No", "Yes, but not in the last year", "Yes, during the last year"], 
+    ["No", "Yes, but not in the last year", "Yes, during the last year"],
+]
+
 
 @app.route('/')
 def home():
@@ -48,8 +76,10 @@ def store():
     session['name'] = name
     if issue == 'drugs':
         return redirect(url_for('dudit'))
+    elif issue == 'alcohol':
+        return redirect(url_for('audit'))
     else:
-        return f"<h1>Thank you, {name}. Your issue ({issue}) has been recorded.</h1>"
+        return f"<h1>Thank you, {name}. Your issue ({issue}) has been noted.</h1>"
 
 
 @app.route('/dudit', methods=['GET', 'POST'])
@@ -60,6 +90,17 @@ def dudit():
     return render_template('dudit.html',
                            questions=dudit_questions,
                            options=dudit_options,
+                           enumerate=enumerate)
+
+
+@app.route('/audit', methods=['GET', 'POST'])
+def audit():
+    if request.method == 'POST':
+        answers = request.form
+        return f"Thank you for completing the AUDIT questionnaire. Your answers: {dict(answers)}"
+    return render_template('audit.html',
+                           questions=audit_questions,
+                           options=audit_options,
                            enumerate=enumerate)
 
 
