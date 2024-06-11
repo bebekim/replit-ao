@@ -1,7 +1,12 @@
 from flask import Flask, request, render_template, redirect, url_for, session
+import json
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Necessary for using sessions
+UPSTAGE_API_KEY = os.environ['UPSTAGE_API_KEY']
+
+os.makedirs('data/client', exist_ok=True)
 
 # DUDIT Questions
 dudit_questions = [
@@ -33,6 +38,13 @@ audit_questions = [
 ]
 
 
+def save_responses(filename, data):
+    filepath = os.path.join('data/client', filename)
+    with open(filepath, 'a') as file:
+        json.dump(data, file)
+        file.write('\n')
+
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -61,14 +73,21 @@ def store():
     elif issue == 'alcohol':
         return redirect(url_for('audit'))
     else:
-        return f"<h1>Thank you, {name}. Your issue ({issue}) has been recorded.</h1>"
+        return f"<h1>Thank you, {name}. Your issue ({issue}) has been noted.</h1>"
 
 
 @app.route('/dudit', methods=['GET', 'POST'])
 def dudit():
     if request.method == 'POST':
-        answers = request.form
-        return f"Thank you for completing the DUDIT questionnaire. Your answers: {dict(answers)}"
+        answers = request.form.to_dict()
+        pairs = [(dudit_questions[int(k[1:])], v) for k, v in answers.items()]
+        response_data = {
+            'name': session.get('name'),
+            'issue': session.get('issue'),
+            'responses': pairs
+        }
+        save_responses('dudit_responses.json', response_data)
+        return f"<h1>Thank you for completing the DUDIT questionnaire. Your responses have been noted.</h1>"
     return render_template('dudit.html',
                            questions=dudit_questions,
                            enumerate=enumerate)
@@ -77,8 +96,15 @@ def dudit():
 @app.route('/audit', methods=['GET', 'POST'])
 def audit():
     if request.method == 'POST':
-        answers = request.form
-        return f"Thank you for completing the AUDIT questionnaire. Your answers: {dict(answers)}"
+        answers = request.form.to_dict()
+        pairs = [(audit_questions[int(k[1:])], v) for k, v in answers.items()]
+        response_data = {
+            'name': session.get('name'),
+            'issue': session.get('issue'),
+            'responses': pairs
+        }
+        save_responses('audit_responses.json', response_data)
+        return f"<h1>Thank you for completing the AUDIT questionnaire. Your responses have been noted.</h1>"
     return render_template('audit.html',
                            questions=audit_questions,
                            enumerate=enumerate)
