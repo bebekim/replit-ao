@@ -4,7 +4,6 @@ import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Necessary for using sessions
-UPSTAGE_API_KEY = os.environ['UPSTAGE_API_KEY']
 
 os.makedirs('data/client', exist_ok=True)
 
@@ -76,23 +75,6 @@ def store():
         return f"<h1>Thank you, {name}. Your issue ({issue}) has been noted.</h1>"
 
 
-@app.route('/dudit', methods=['GET', 'POST'])
-def dudit():
-    if request.method == 'POST':
-        answers = request.form.to_dict()
-        pairs = [(dudit_questions[int(k[1:])], v) for k, v in answers.items()]
-        response_data = {
-            'name': session.get('name'),
-            'issue': session.get('issue'),
-            'responses': pairs
-        }
-        save_responses('dudit_responses.json', response_data)
-        return f"<h1>Thank you for completing the DUDIT questionnaire. Your responses have been noted.</h1>"
-    return render_template('dudit.html',
-                           questions=dudit_questions,
-                           enumerate=enumerate)
-
-
 @app.route('/audit', methods=['GET', 'POST'])
 def audit():
     if request.method == 'POST':
@@ -110,5 +92,25 @@ def audit():
                            enumerate=enumerate)
 
 
+
+@app.route('/dudit', methods=['GET', 'POST'])
+def dudit():
+    if request.method == 'POST':
+        answers = request.form.to_dict()
+        pairs = [(dudit_questions[int(k[1:])], v) for k, v in answers.items()]
+        response_data = {
+            'name': session.get('name'),
+            'issue': session.get('issue'),
+            'responses': pairs
+        }
+        save_responses('dudit_responses.json', response_data)
+        return f"<h1>Thank you for completing the DUDIT questionnaire. Your responses have been noted.</h1>"
+    return render_template('dudit.html',
+                           questions=dudit_questions,
+                           enumerate=enumerate)
+
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
