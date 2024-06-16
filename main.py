@@ -1,11 +1,13 @@
 from flask import Flask, request, render_template, redirect, url_for, session
 import json
 import os
+import logging
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Necessary for using sessions
+app.secret_key = 'development'  # Necessary for using sessions
 
 os.makedirs('data/client', exist_ok=True)
+logging.basicConfig(level=logging.INFO)
 
 # DUDIT Questions
 dudit_questions = [
@@ -36,12 +38,99 @@ audit_questions = [
     "Has a relative, friend, doctor, or other health care worker been concerned about your drinking or suggested you cut down?"
 ]
 
+# Scoring scheme for AUDIT responses
+audit_scoring = [
+    {
+        "Never": 0,
+        "Monthly or less": 1,
+        "2-4 times a month": 2,
+        "2-3 times a week": 3,
+        "4 or more times a week": 4
+    },  # Q1
+    {
+        "0 - 2": 0,
+        "3 or 4": 1,
+        "5 or 6": 2,
+        "7 to 9": 3,
+        "10 or more": 4
+    },  # Q2
+    {
+        "Never": 0,
+        "Less than monthly": 1,
+        "Monthly": 2,
+        "Weekly": 3,
+        "Daily or almost daily": 4
+    },  # Q3-Q8
+    {
+        "Never": 0,
+        "Less than monthly": 1,
+        "Monthly": 2,
+        "Weekly": 3,
+        "Daily or almost daily": 4
+    },  # Q4
+    {
+        "Never": 0,
+        "Less than monthly": 1,
+        "Monthly": 2,
+        "Weekly": 3,
+        "Daily or almost daily": 4
+    },  # Q5
+    {
+        "Never": 0,
+        "Less than monthly": 1,
+        "Monthly": 2,
+        "Weekly": 3,
+        "Daily or almost daily": 4
+    },  # Q6
+    {
+        "Never": 0,
+        "Less than monthly": 1,
+        "Monthly": 2,
+        "Weekly": 3,
+        "Daily or almost daily": 4
+    },  # Q7
+    {
+        "Never": 0,
+        "Less than monthly": 1,
+        "Monthly": 2,
+        "Weekly": 3,
+        "Daily or almost daily": 4
+    },  # Q8
+    {
+        "No": 0,
+        "Yes, but not in the last year": 2,
+        "Yes, during the last year": 4
+    },  # Q9-Q10
+    {
+        "No": 0,
+        "Yes, but not in the last year": 2,
+        "Yes, during the last year": 4
+    },  # Q10
+]
+
+
+def calculate_audit_score(answers):
+    score = 0
+    for idx, (question, answer) in enumerate(answers.items()):
+        if answer in audit_scoring[idx]:
+            score += audit_scoring[idx][answer]
+        else:
+            logging.error(
+                f"Unexpected answer '{answer}' for question index {idx}")
+            raise ValueError(
+                f"Unexpected answer '{answer}' for question index {idx}")
+    return score
+
 
 def save_responses(filename, data):
-    filepath = os.path.join('data/client', filename)
-    with open(filepath, 'a') as file:
-        json.dump(data, file)
-        file.write('\n')
+    try:
+        filepath = os.path.join('data/client', filename)
+        with open(filepath, 'a') as file:
+            json.dump(data, file)
+            file.write('\n')
+    except Exception as e:
+        logging.error("Error saving responses: %s", e)
+        raise
 
 
 @app.route('/')
@@ -78,19 +167,32 @@ def store():
 @app.route('/audit', methods=['GET', 'POST'])
 def audit():
     if request.method == 'POST':
-        answers = request.form.to_dict()
-        pairs = [(audit_questions[int(k[1:])], v) for k, v in answers.items()]
-        response_data = {
-            'name': session.get('name'),
-            'issue': session.get('issue'),
-            'responses': pairs
-        }
-        save_responses('audit_responses.json', response_data)
-        return f"<h1>Thank you for completing the AUDIT questionnaire. Your responses have been noted.</h1>"
-    return render_template('audit.html',
-                           questions=audit_questions,
-                           enumerate=enumerate)
-
+        try:
+            # Collect answers from the form
+            answers = request.form.to_dict()
+            # Pair each question with its corresponding answer
+            pairs = [(audit_questions[int(k[1:])], v)
+                     for k, v in answers.items()]
+            # Calculate the total score
+            score = calculate_audit_score(answers)
+            # Prepare the response data
+            response_data = {
+                'name': session.get('name'),
+                'issue': session.get('issue'),
+                'responses': pairs,
+                'score': score
+            }
+            # Save responses to a file
+            save_responses('audit_responses.json', response_data)
+            return f"<h1>Thank you for completing the AUDIT questionnaire. Your score is {score}. Your responses have been recorded.</h1>"
+        except Exception as e:
+            logging.error("Error processing audit responses: %s", e)
+            return f"<h1>Internal Server Error</h1><p>{e}</p>", 500
+    else:
+        # For GET requests, render the audit.html template
+        return render_template('audit.html',
+                               questions=audit_questions,
+                               enumerate=enumerate)
 
 
 @app.route('/dudit', methods=['GET', 'POST'])
@@ -108,7 +210,6 @@ def dudit():
     return render_template('dudit.html',
                            questions=dudit_questions,
                            enumerate=enumerate)
-
 
 
 if __name__ == '__main__':
