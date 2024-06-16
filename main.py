@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, redirect, url_for, session
 import json
 import os
 import logging
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'development'  # Necessary for using sessions
@@ -164,10 +165,26 @@ def store():
         return f"<h1>Thank you, {name}. Your issue ({issue}) has been noted.</h1>"
 
 
+def save_responses(filename, data):
+    try:
+        filepath = os.path.join('data/client', filename)
+        with open(filepath, 'a') as file:
+            json.dump(data, file)
+            file.write('\n')
+    except Exception as e:
+        logging.error("Error saving responses: %s", e)
+        raise
+
+
 @app.route('/audit', methods=['GET', 'POST'])
 def audit():
     if request.method == 'POST':
         try:
+            current_time = datetime.now()
+            timestamp = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+            # Adjust the filename to include the timestamp
+            filename = f'audit_responses_{timestamp}.json'
+
             # Collect answers from the form
             answers = request.form.to_dict()
             # Pair each question with its corresponding answer
@@ -182,8 +199,8 @@ def audit():
                 'responses': pairs,
                 'score': score
             }
-            # Save responses to a file
-            save_responses('audit_responses.json', response_data)
+            # Save responses to a file with timestamp in the filename
+            save_responses(filename, response_data)
             return f"<h1>Thank you for completing the AUDIT questionnaire. Your score is {score}. Your responses have been recorded.</h1>"
         except Exception as e:
             logging.error("Error processing audit responses: %s", e)
