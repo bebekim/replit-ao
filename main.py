@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Necessary for using sessions
-UPSTAGE_API_KEY = os.environ['UPSTAGE_API_KEY']
+# UPSTAGE_API_KEY = os.environ['UPSTAGE_API_KEY']
 
 os.makedirs('data/client', exist_ok=True)
 
@@ -36,6 +36,88 @@ audit_questions = [
     "Have you or someone else been injured because of your drinking?",
     "Has a relative, friend, doctor, or other health care worker been concerned about your drinking or suggested you cut down?"
 ]
+
+# Scoring scheme for AUDIT responses
+audit_scoring = [
+    {
+        "Never": 0,
+        "Monthly or less": 1,
+        "2-4 times a month": 2,
+        "2-3 times a week": 3,
+        "Daily or almost daily": 4
+    },  # Q1
+    {
+        "1 or 2": 0,
+        "3 or 4": 1,
+        "5 or 6": 2,
+        "7 to 9": 3,
+        "10 or more": 4
+    },  # Q2
+    {
+        "Never": 0,
+        "Less than monthly": 1,
+        "Monthly": 2,
+        "Weekly": 3,
+        "Daily or almost daily": 4
+    },  # Q3
+    {
+        "Never": 0,
+        "Less than monthly": 1,
+        "Monthly": 2,
+        "Weekly": 3,
+        "Daily or almost daily": 4
+    },  # Q4
+    {
+        "Never": 0,
+        "Less than monthly": 1,
+        "Monthly": 2,
+        "Weekly": 3,
+        "Daily or almost daily": 4
+    },  # Q5
+    {
+        "Never": 0,
+        "Less than monthly": 1,
+        "Monthly": 2,
+        "Weekly": 3,
+        "Daily or almost daily": 4
+    },  # Q6
+    {
+        "Never": 0,
+        "Less than monthly": 1,
+        "Monthly": 2,
+        "Weekly": 3,
+        "Daily or almost daily": 4
+    },  # Q7
+    {
+        "Never": 0,
+        "Less than monthly": 1,
+        "Monthly": 2,
+        "Weekly": 3,
+        "Daily or almost daily": 4
+    },  # Q8
+    {
+        "No": 0,
+        "Yes, but not in the last year": 2,
+        "Yes, during the last year": 4
+    },  # Q9
+    {
+        "No": 0,
+        "Yes, but not in the last year": 2,
+        "Yes, during the last year": 4
+    },  # Q10
+]
+
+# def calculate_audit_score(answers):
+#     score = 0
+#     for idx, (_, answer) in enumerate(answers.items()):
+#         if answer in audit_scoring[idx]:
+#             score += audit_scoring[idx][answer]
+#         else:
+#             logging.error(
+#                 f"Unexpected answer '{answer}' for question index {idx}")
+#             raise ValueError(
+#                 f"Unexpected answer '{answer}' for question index {idx}")
+#     return score
 
 
 def save_responses(filename, data):
