@@ -1,21 +1,48 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LLM-based Triage System</title>
-</head>
-<body>
-    <h1>Welcome to the Triage System</h1>
-    <form action="/submit" method="post">
-        <p>What brings you to the site today?</p>
-        <input type="radio" id="alcohol" name="issue" value="alcohol">
-        <label for="alcohol">I am developing a dependency in alcohol</label><br>
-        <input type="radio" id="drugs" name="issue" value="drugs">
-        <label for="drugs">I am developing or have developed a dependency in drugs</label><br>
-        <input type="radio" id="eating" name="issue" value="eating">
-        <label for="eating">I am developing a dependency in eating, becoming an emotional eater</label><br><br>
-        <input type="submit" value="Submit">
-    </form>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AI Prompt Interviewing</title>
+    </head>
+    <body>
+        <h1>Welcome to AI Cares</h1>
+        <p>
+            You’re here to explore your relationship with substances and learn
+            more about yourself. Your curiosity is welcomed.
+        </p>
+        <p>
+            We understand that you might have concerns about your substance use
+            or other behaviors. You want to make informed choices quickly and
+            effectively.
+        </p>
+        <p>
+            Our approach embraces “harm reduction” and “motivational
+            interviewing” to support you. Harm reduction acknowledges that
+            change is gradual and focuses on reducing harm without coercion.
+            Motivational interviewing helps you explore and achieve your goals
+            through guided self-reflection.
+        </p>
+        <p>
+            My questions, or “prompts,” and your written responses can therefore
+            be seen as a kind of conversation.
+        </p>
+        <p>Let’s start this journey together.</p>
+        <form action="/submit" method="post">
+            <p>What brings you here today?</p>
+            <input type="radio" id="eating" name="issue" value="eating" />
+            <label for="eating"
+                >I am developing a dependency in eating, becoming an emotional
+                eater</label
+            ><br />
+            <input type="radio" id="alcohol" name="issue" value="alcohol" />
+            <label for="alcohol">I am developing a dependency in alcohol</label
+            ><br />
+            <input type="radio" id="drugs" name="issue" value="drugs" />
+            <label for="drugs"
+                >I am developing or have developed a dependency in drugs</label
+            ><br /><br />
+            <input type="submit" value="Submit" />
+        </form>
+    </body>
 </html>
