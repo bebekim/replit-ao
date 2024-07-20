@@ -59,13 +59,23 @@
                 if (message) {
                     appendMessage("You: " + message);
                     userInput.value = "";
-                    // Here you would typically send the message to your backend
-                    // and get a response from the AI. For now, we'll just echo the message.
-                    setTimeout(() => {
-                        appendMessage(
-                            'AI: I received your message: "' + message + '"',
-                        );
-                    }, 1000);
+
+                    // Send the message to the backend
+                    fetch("/chat", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ message: message }),
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            appendMessage("AI: " + data.response);
+                        })
+                        .catch((error) => {
+                            console.error("Error:", error);
+                            appendMessage("AI: Sorry, I encountered an error.");
+                        });
                 }
             }
 

@@ -1,14 +1,23 @@
-from flask import Flask, request, render_template, redirect, url_for, session
-import json
 import os
+import json
 import logging
 from datetime import datetime
+
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify
+
+from openai import OpenAI
 
 app = Flask(__name__)
 app.secret_key = 'development'  # Necessary for using sessions
 
 os.makedirs('data/client', exist_ok=True)
 logging.basicConfig(level=logging.INFO)
+
+# Initialize OPENAI LLM
+openai_api_key = os.environ.get('OPENAI_API_KEY')
+if not openai_api_key:
+    raise ValueError("OPENAI_API_KEY environment variable is not set")
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 # DUDIT Questions
 dudit_questions = [
@@ -275,6 +284,44 @@ def dudit():
 @app.route('/start-chat')
 def start_chat():
     return render_template('chatbot.html')
+
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    try:
+        user_message = request.json['message']
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",  # You can change this to the appropriate model
+            messages=[{
+                "role":
+                "system",
+                "content":
+                "You are a helpful assistant specializing in mental health and substance abuse counseling."
+            }, {
+                "role": "user",
+                "content": user_message
+            }])
+
+        # Log the entire response object for debugging
+        logging.info(f"OpenAI response: {response}")
+
+        # Extract the assistant's reply
+        assistant_reply = response.choices[0].message.content
+
+        # Check the finish_reason
+        finish_reason = response.choices[0].finish_reason
+        if finish_reason != "stop":
+            logging.warning(f"Unexpected finish_reason: {finish_reason}")
+
+        return jsonify({'response': assistant_reply})
+
+    except Exception as e:
+        logging.error(f"Error in chat function: {str(e)}")
+        return jsonify({
+            'response':
+            "I apologize, but I encountered an error while processing your request."
+        }), 500
 
 
 if __name__ == '__main__':
