@@ -205,10 +205,8 @@ def process_eating_checklist():
     selected_items = request.form.getlist('checklist_item')
     count_selected = len(selected_items)
 
-    # Format each selected item with HTML line breaks
     selected_items_str = '<br>'.join(f"[v] {item}" for item in selected_items)
 
-    # Construct the full response message with HTML formatting
     response_message = f"""
     <pre>
 You have selected:
@@ -216,6 +214,7 @@ You have selected:
 -----------
 Total: {count_selected}
     </pre>
+    <a href="/start-chat" class="btn">Start Chat with AI Assistant</a>
     """
 
     return response_message
@@ -239,7 +238,11 @@ def audit():
                 'score': score
             }
             save_responses(filename, response_data)
-            return f"<h1>Thank you for completing the AUDIT questionnaire. Your score is {score}. Your responses have been recorded.</h1>"
+            return f"""
+            <h1>Thank you for completing the AUDIT questionnaire. Your score is {score}. Your responses have been recorded.</h1>
+            <a href="/start-chat" class="btn">Start Chat with AI Assistant</a>
+            """
+
         except Exception as e:
             logging.error("Error processing audit responses: %s", e)
             return f"<h1>Internal Server Error</h1><p>{e}</p>", 500
@@ -260,10 +263,18 @@ def dudit():
             'responses': pairs
         }
         save_responses('dudit_responses.json', response_data)
-        return f"<h1>Thank you for completing the DUDIT questionnaire. Your responses have been noted.</h1>"
+        return f"""
+        <h1>Thank you for completing the DUDIT questionnaire. Your responses have been noted.</h1>
+        <a href="/start-chat" class="btn">Start Chat with AI Assistant</a>
+                """
     return render_template('dudit.html',
                            questions=dudit_questions,
                            enumerate=enumerate)
+
+
+@app.route('/start-chat')
+def start_chat():
+    return render_template('chatbot.html')
 
 
 if __name__ == '__main__':
