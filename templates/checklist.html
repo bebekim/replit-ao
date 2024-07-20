@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Eating Checklist</title>
+        <style>
+            ul {
+                list-style-type: none;
+                padding-left: 0;
+            }
+            li {
+                margin-bottom: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Eating Checklist</h1>
+        <form action="/process-eating-checklist" method="post">
+            <p>
+                Please place a check mark next to any of the following that
+                apply:
+            </p>
+            <ul>
+                {% for item in checklist_items %}
+                <li>
+                    <input
+                        type="checkbox"
+                        name="checklist_item"
+                        value="{{ item }}"
+                    />
+                    {{ item }}
+                </li>
+                {% endfor %}
+            </ul>
+            <input type="submit" value="Submit" />
+        </form>
+    </body>
+</html>

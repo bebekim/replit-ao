@@ -157,7 +157,10 @@ def store():
     issue = request.form['issue']
     name = request.form['name']
     session['name'] = name
-    if issue == 'drugs':
+
+    if issue == 'eating':
+        return redirect(url_for('emotional_eating_checklist'))
+    elif issue == 'drugs':
         return redirect(url_for('dudit'))
     elif issue == 'alcohol':
         return redirect(url_for('audit'))
@@ -165,15 +168,57 @@ def store():
         return f"<h1>Thank you, {name}. Your issue ({issue}) has been noted.</h1>"
 
 
-def save_responses(filename, data):
-    try:
-        filepath = os.path.join('data/client', filename)
-        with open(filepath, 'a') as file:
-            json.dump(data, file)
-            file.write('\n')
-    except Exception as e:
-        logging.error("Error saving responses: %s", e)
-        raise
+@app.route('/emotional-eating-checklist', methods=['GET', 'POST'])
+def emotional_eating_checklist():
+    if request.method == 'POST':
+        selected_items = request.form.getlist('checklist_item')
+        return f"<h1>Thank you, {session.get('name')}. Your responses to the Emotional Eating Checklist have been recorded.</h1>"
+    else:
+        emotional_eating_checklist = [
+            "I use food as a tranquilizer to dull emotions that are difficult to cope with, such as anxiety, anger, sadness, frustration, hopelessness, loneliness, shame, guilt, and even happiness, excitement, and joy.",
+            "I use food to calm me when I'm experiencing an unpleasant bodily sensation, such as agitation, nervousness, or muscle tension.",
+            "I turn to food for soothing and comfort.",
+            "I use food for pleasure, escape, fulfillment, and excitement.",
+            "I eat when I'm stressed out.", "I eat when I feel numb.",
+            "I use food to silence negative, critical, self-defeating thoughts and quiet my mind.",
+            "I eat when I'm overwhelmed and feeling paralyzed.",
+            "I eat to distract myself from low-motivation states like boredom, lethargy, or apathy.",
+            "I eat as a way to procrastinate.",
+            "I eat because my life lacks purpose, meaning, passion, and inspiration.",
+            "I try to fill up an inner emptiness with food.",
+            "I eat because I feel so much regret regarding my life.",
+            "I eat because I feel deprived in life.",
+            "I eat to reward myself.", "I eat to punish myself.",
+            "I eat to rebel against someone or something.",
+            "I eat because feeling full makes me feel safe.",
+            "I eat to ward off sexual attention.",
+            "My preoccupation with food and weight keeps me from moving forward in life.",
+            "I can't imagine life feeling satisfying without my favorite comfort foods.",
+            "Food is my best friend."
+        ]
+        return render_template('checklist.html',
+                               checklist_items=emotional_eating_checklist)
+
+
+@app.route('/process-eating-checklist', methods=['POST'])
+def process_eating_checklist():
+    selected_items = request.form.getlist('checklist_item')
+    count_selected = len(selected_items)
+
+    # Format each selected item with HTML line breaks
+    selected_items_str = '<br>'.join(f"[v] {item}" for item in selected_items)
+
+    # Construct the full response message with HTML formatting
+    response_message = f"""
+    <pre>
+You have selected:
+{selected_items_str}
+-----------
+Total: {count_selected}
+    </pre>
+    """
+
+    return response_message
 
 
 @app.route('/audit', methods=['GET', 'POST'])
@@ -182,31 +227,23 @@ def audit():
         try:
             current_time = datetime.now()
             timestamp = current_time.strftime("%Y-%m-%d_%H-%M-%S")
-            # Adjust the filename to include the timestamp
             filename = f'audit_responses_{timestamp}.json'
-
-            # Collect answers from the form
             answers = request.form.to_dict()
-            # Pair each question with its corresponding answer
             pairs = [(audit_questions[int(k[1:])], v)
                      for k, v in answers.items()]
-            # Calculate the total score
             score = calculate_audit_score(answers)
-            # Prepare the response data
             response_data = {
                 'name': session.get('name'),
                 'issue': session.get('issue'),
                 'responses': pairs,
                 'score': score
             }
-            # Save responses to a file with timestamp in the filename
             save_responses(filename, response_data)
             return f"<h1>Thank you for completing the AUDIT questionnaire. Your score is {score}. Your responses have been recorded.</h1>"
         except Exception as e:
             logging.error("Error processing audit responses: %s", e)
             return f"<h1>Internal Server Error</h1><p>{e}</p>", 500
     else:
-        # For GET requests, render the audit.html template
         return render_template('audit.html',
                                questions=audit_questions,
                                enumerate=enumerate)
@@ -230,5 +267,4 @@ def dudit():
 
 
 if __name__ == '__main__':
-    # app.run(debug=True)
     app.run(host='0.0.0.0', port=5001, debug=True)

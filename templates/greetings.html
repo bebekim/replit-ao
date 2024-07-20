@@ -1,17 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Greetings</title>
-</head>
-<body>
-    <h1>It's nice that you came to address the issue.</h1>
-    <form action="/store" method="post">
-        <input type="hidden" name="issue" value="{{ issue }}">
-        <label for="name">How would you like me to refer to you?</label><br>
-        <input type="text" id="name" name="name" required><br><br>
-        <input type="submit" value="Submit">
-    </form>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Greetings</title>
+    </head>
+    <body>
+        <h1>It's nice that you came to address the issue.</h1>
+        <form action="/store" method="post">
+            <input type="hidden" name="issue" value="{{ issue }}" />
+            <label for="name">How would you like me to refer to you?</label
+            ><br />
+            <input type="text" id="name" name="name" required /><br /><br />
+            <input type="submit" value="Submit" />
+        </form>
+    </body>
 </html>

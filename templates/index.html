@@ -31,10 +31,7 @@
         <form action="/submit" method="post">
             <p>What brings you here today?</p>
             <input type="radio" id="eating" name="issue" value="eating" />
-            <label for="eating"
-                >I am developing a dependency in eating, becoming an emotional
-                eater</label
-            ><br />
+            <label for="eating">I may be an emotional eater</label><br />
             <input type="radio" id="alcohol" name="issue" value="alcohol" />
             <label for="alcohol">I am developing a dependency in alcohol</label
             ><br />
@@ -44,5 +41,24 @@
             ><br /><br />
             <input type="submit" value="Submit" />
         </form>
+
+        <script>
+            document.getElementById("issueForm").onsubmit = function (e) {
+                var radios = document.getElementsByName("issue");
+                var formValid = false;
+
+                for (var i = 0; i < radios.length; i++) {
+                    if (radios[i].checked) {
+                        formValid = true;
+                        break;
+                    }
+                }
+
+                if (!formValid) {
+                    alert("Please select an issue before submitting.");
+                    e.preventDefault();
+                }
+            };
+        </script>
     </body>
 </html>
